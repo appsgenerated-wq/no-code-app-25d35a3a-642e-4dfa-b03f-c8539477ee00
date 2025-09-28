@@ -1,0 +1,75 @@
+name: MarsRecruit
+entities:
+  User:
+    authenticable: true
+    properties:
+      - name
+      - name: email
+        type: email
+      - name: role
+        type: choice
+        options:
+          values: [admin, applicant]
+        default: applicant
+    policies:
+      create:
+        - access: admin
+      read:
+        - access: restricted
+          allow: User
+          condition: self
+        - access: admin
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+        - access: admin
+      delete:
+        - access: admin
+      signup:
+        - access: public
+
+  Application:
+    properties:
+      - name: motivation
+        type: text
+        helpText: 'Why do you want to go to Mars? (max 500 characters)'
+      - name: skills
+        type: text
+        helpText: 'List your relevant skills (e.g., engineering, medicine, botany).'
+      - name: hasApplied
+        type: boolean
+        default: false
+      - name: status
+        type: choice
+        options:
+          values: [submitted, under_review, accepted, rejected]
+        default: submitted
+    belongsTo:
+      - name: applicant
+        entity: User
+    policies:
+      create:
+        - access: restricted
+          allow: User
+      read:
+        - access: restricted
+          allow: User
+          condition: self
+        - access: admin
+      update:
+        - access: restricted
+          allow: User
+          condition: self
+        - access: admin
+      delete:
+        - access: admin
+
+
+# Health check endpoint for connection testing
+endpoints:
+  health:
+    path: /api/health
+    method: GET
+    policies: []
+    handler: healthCheck
